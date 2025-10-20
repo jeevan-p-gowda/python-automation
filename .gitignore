@@ -5,8 +5,42 @@ build/
 dist/
 wheels/
 *.egg-info
+*.py[cod]
+*$py.class
 
 # Virtual environments
+.env
+.env.*
 .venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-.idea
+# uv/uvx specific
+.uv/
+.uvx/
+.venv.uv/
+
+# IDEs and editors
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+
+# cursor
+.cursor*
+
+# Pytest
+.pytest_cache/
+
+# ruff
+.ruff_cache/
+.ruff_cache.*
