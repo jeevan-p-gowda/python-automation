@@ -1,0 +1,20 @@
+{
+    "python.defaultInterpreterPath": ".venv/bin/python",
+
+    "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+    },
+
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+      }
+    },
+    "ruff.enable": true,
+    "ruff.configurationPreference": "filesystemFirst",
+    "ruff.nativeServer": true
+}
