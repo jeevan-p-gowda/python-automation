@@ -1,6 +1,7 @@
 import json
 
 import requests
+
 from src.api.api_constants.api_enums import EndpointEnums
 from src.api.api_utils.api_utils import ApiUtils
 from src.common.log_utils import pretty_print_request_and_response
@@ -31,7 +32,7 @@ class _BaseClient:
         )
         response: requests.Response = self.session.post(**api)
         pretty_print_request_and_response(response)
-        # response.raise_for_status()
+        response.raise_for_status()
         return json.loads(response.text)
 
     def put(self, **kwargs) -> str:
