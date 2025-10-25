@@ -1,0 +1,12 @@
+{
+  "product": {
+    "products": "/api/products"
+  },
+  "cart": {
+    "cart": "/api/cart",
+    "items": "/api/cart/{cart_id}/items"
+  },
+  "payment": {
+    "payment": "/api/payment"
+  }
+}

@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "jsonschema>=4.25.1",
     "pytest>=8.3.5",
     "python-dotenv>=1.1.1",
     "requests>=2.32.3",
@@ -12,5 +13,67 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "pytest-html>=4.1.1",
     "ruff>=0.13.2",
 ]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "venv",
+]
+line-length = 120
+indent-width = 4
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "W", "I", "N", "UP", "S", "BLE", "FBT", "C4", "DTZ", "T10", "EM", "ISC", "ICN"]
+ignore = ["EM101", "EM102", "S101", "S105", "B024", "B006", "F841", "BLE001", "B904", "F403", "F405"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+addopts = [ "-v",
+            "--self-contained-html",
+            "--headed",
+            "--browser=chromium",
+            "--log-cli-level=INFO",
+            ]
+testpaths = ["tests"]
+markers = [
+    "rate_limit: Rate limit validation tests that make 100+ requests within 60 seconds",
+]
+# Log format configuration for HTML reports and console
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+# Log format for captured logs in HTML reports
+log_file_level = "INFO"
+log_format = "%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
