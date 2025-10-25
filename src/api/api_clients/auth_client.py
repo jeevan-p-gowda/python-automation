@@ -2,6 +2,7 @@ import base64
 import json
 
 import requests
+
 from src.api.api_clients.base_client import _BaseClient
 from src.common.env_enums import EnvEnums
 from src.common.log_utils import log, logger
@@ -19,9 +20,7 @@ class AuthClient(_BaseClient):
 
     @log
     def get_bearer_token(self):
-        credentials = base64.b64encode(
-            (self.__api_key + ":" + self.__api_secret).encode()
-        ).decode("utf-8")
+        credentials = base64.b64encode((self.__api_key + ":" + self.__api_secret).encode()).decode("utf-8")
         response = self.__requests.get(
             self.__auth_url,
             headers={"Authorization": f"Basic {credentials}"},
