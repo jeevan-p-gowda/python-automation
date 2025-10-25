@@ -1,4 +1,5 @@
 # Module-level logger that will be set by conftest
+import functools
 import logging
 import os
 
@@ -47,6 +48,7 @@ def logger():
 def log(func):
     """Decorator to log function name when called."""
 
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if _logger:
             _logger.info(f"Calling function: {func.__name__}")
