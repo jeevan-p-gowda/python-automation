@@ -1,16 +1,14 @@
 import time
 
 import pytest
-from src.api.api_clients.auth_client import AuthClient
 
+from src.api.api_clients.auth_client import AuthClient
 from src.common.common_utils import check_and_load_env
 from src.common.log_utils import logger, set_logger
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--env", action="store", required=True, help="Environment to run tests on"
-    )
+    parser.addoption("--env", action="store", required=True, help="Environment to run tests on")
 
 
 @pytest.hookimpl(tryfirst=True)
