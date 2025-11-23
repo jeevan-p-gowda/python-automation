@@ -16,6 +16,7 @@ dev = [
     "pytest-html>=4.1.1",
     "pytest-repeat>=0.9.4",
     "pytest-rerunfailures>=16.1",
+    "pytest-timeout>=2.4.0",
     "ruff>=0.13.2",
 ]
 
@@ -66,6 +67,7 @@ addopts = [ "-v",
             "--log-cli-level=INFO",
             ]
 testpaths = ["tests"]
+timeout=150
 markers = [
     "rate_limit: Rate limit validation tests that make 100+ requests within 60 seconds",
 ]
