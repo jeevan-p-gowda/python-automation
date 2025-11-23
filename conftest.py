@@ -1,3 +1,4 @@
+import os
 import time
 
 import pytest
@@ -26,6 +27,10 @@ def pytest_configure(config):
         config.option.htmlpath = "results/api/report.html"
     else:
         raise ValueError("Invalid test path. Expected /ui or /api in path.")
+
+    if os.getenv("CI"):
+        config.option.reruns = 1
+        config.option.reruns_delay = 1
 
 
 @pytest.fixture(scope="session", autouse=True)
