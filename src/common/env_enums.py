@@ -8,5 +8,6 @@ class EnvEnums(Enum):
     API_URL: str = "API_URL"
     API_KEY: str = "API_KEY"
     API_SECRET: str = "API_SECRET"
+    MFA_SECRET_KEY: str = "MFA_SECRET_KEY"
     EMAIL: str = "EMAIL"
     PASSWORD: str = "PASSWORD"
