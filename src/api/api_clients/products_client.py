@@ -2,7 +2,7 @@ from src.api.api_clients.base_client import _BaseClient
 from src.common.log_utils import log
 
 
-class ProductClient(_BaseClient):
+class ProductsClient(_BaseClient):
     def __init__(self, **kwargs):
         super().__init__()
 
