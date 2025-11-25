@@ -46,7 +46,7 @@ def page(browser, request):
     Navigate to the base URL with storage state.
     """
     env: str = request.config.getoption("--env")
-    context = browser.new_context(storage_state=f".auth/{env}-auth.json")
+    context = browser.new_context(storage_state=f".auth/{env}-auth.json", viewport={"width": 1920, "height": 1080})
     page = context.new_page()
     # Navigation timeout
     page.set_default_navigation_timeout(50000)
