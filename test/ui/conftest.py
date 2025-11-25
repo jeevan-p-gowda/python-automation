@@ -40,7 +40,7 @@ def create_ui_session(request, playwright):
     logger().info("--Global setup completed 🌐--")
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def page(browser, request):
     """
     Navigate to the base URL with storage state.
@@ -59,4 +59,4 @@ def page(browser, request):
     logger().info("Navigating to base URL with storage state...")
     page.goto(env_vars[EnvEnums.BASE_URL.value])
     yield page
-    browser.close()
+    page.close()
