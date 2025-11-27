@@ -12,7 +12,7 @@ Please report security vulnerabilities to [security contact].
    - Use minimal required permissions
 
 2. **Environment Variables**
-   - Keep .env files secure and private
+   - Keep `.env` files secure and private
    - Use separate tokens for development/production
 
 3. **Access Control**
