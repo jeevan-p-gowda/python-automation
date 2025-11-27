@@ -1,3 +1,5 @@
+import base64
+
 import pytest
 from playwright.sync_api import expect
 
@@ -60,3 +62,22 @@ def page(browser, request):
     page.goto(env_vars[EnvEnums.BASE_URL.value])
     yield page
     page.close()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    pytest_html = item.config.pluginmanager.getplugin("html")
+    outcome = yield
+    report = outcome.get_result()
+    extras = getattr(report, "extras", [])
+    if report.when == "call":
+        xfail = hasattr(report, "wasxfail")
+        if report.failed or xfail and "page" in item.funcargs:
+            page = item.funcargs["page"]
+            screenshot_bytes = page.screenshot(full_page=True)
+
+            screenshot_b64 = base64.b64encode(screenshot_bytes).decode()
+        if (report.skipped and xfail) or (report.failed and not xfail) or report.errors:
+            # add the screenshots to the html report
+            extras.append(pytest_html.extras.png(screenshot_b64))
+        report.extras = extras

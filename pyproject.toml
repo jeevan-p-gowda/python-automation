@@ -63,7 +63,6 @@ line-ending = "auto"
 
 [tool.pytest.ini_options]
 addopts = [ "-v",
-            "--self-contained-html",
             "--headed",
             "--browser=chromium",
             "--log-cli-level=INFO",
