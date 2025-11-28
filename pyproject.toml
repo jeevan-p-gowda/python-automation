@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "jsonschema>=4.25.1",
+    "pyotp>=2.9.0",
     "pytest>=8.3.5",
+    "pytest-playwright>=0.7.2",
     "python-dotenv>=1.1.1",
     "requests>=2.32.3",
 ]
@@ -50,7 +52,7 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "W", "I", "N", "UP", "S", "BLE", "FBT", "C4", "DTZ", "T10", "EM", "ISC", "ICN"]
-ignore = ["EM101", "EM102", "S101", "S105", "B024", "B006", "F841", "BLE001", "B904", "F403", "F405"]
+ignore = ["EM101", "EM102", "S101", "S105", "B024", "B006", "F841", "BLE001", "B904", "F403", "F405", "FBT002", "FBT001"]
 fixable = ["ALL"]
 unfixable = []
 
@@ -62,7 +64,6 @@ line-ending = "auto"
 
 [tool.pytest.ini_options]
 addopts = [ "-v",
-            "--self-contained-html",
             "--headed",
             "--browser=chromium",
             "--log-cli-level=INFO",
