@@ -10,8 +10,4 @@ class ProductsUiAssertions(UiAssertions):
 
     @log
     def assert_search_results_heading(self, locator: Locator, soft: bool = False):
-        heading: str = "Search results"
-        if soft:
-            self.assert_text_in_an_element(locator=locator, text=heading, soft=True)
-        else:
-            self.assert_text_in_an_element(locator=locator, text=heading)
+        self.assert_text_in_an_element(locator=locator, text="Search results", soft=soft)

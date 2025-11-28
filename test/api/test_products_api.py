@@ -1,7 +1,7 @@
-from src.api.api_clients.product_client import ProductClient
+from src.api.api_clients.products_client import ProductClient
 
 
-class TestProductApi:
+class TestProductsApi:
     def setup_class(self):
         self.product_client = ProductClient()
 
