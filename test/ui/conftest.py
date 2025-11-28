@@ -77,7 +77,7 @@ def pytest_runtest_makereport(item, call):
             screenshot_bytes = page.screenshot(full_page=True)
 
             screenshot_b64 = base64.b64encode(screenshot_bytes).decode()
-        if (report.skipped and xfail) or (report.failed and not xfail) or report.errors:
+        if (report.skipped and xfail) or (report.failed and not xfail):
             # add the screenshots to the html report
             extras.append(pytest_html.extras.png(screenshot_b64))
         report.extras = extras
