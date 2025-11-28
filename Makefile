@@ -14,4 +14,5 @@ setup:
 	@source .venv/bin/activate
 	@uv sync
 	@playwright install chromium
+	@pre-commit install
 	@echo "✅ Setup complete!"
