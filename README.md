@@ -2,6 +2,10 @@
 
 An E2E unifying test automation framework template.
 
+### 🏗️Pre-requisite
+1. Python foundations and beyond.
+2. Exposure on [requests](https://requests.readthedocs.io/en/latest/) and [playwright](https://playwright.dev/python/).
+
 ### 🛠️Setup
 1. Install Git
     1. For Windows - Install [Git Bash](https://git-scm.com/downloads)
