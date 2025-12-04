@@ -1,0 +1,69 @@
+pipeline {
+    agent { label "generic" }
+
+    options {
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        string(name: 'ENV', defaultValue: '', trim: true, description: 'Environment file name, which is stored in Jenkins credentials')
+        choice(name: 'TEST_FILE_PATH',
+               choices: ["tests/perf/perf_rtt_api.py", "tests/perf/perf_connections_api.py"],
+               description: 'Select a type of test run.')
+        string(name: 'USERS', defaultValue: '', trim: true, description: 'Number of users to simulate')
+        string(name: 'SPAWN_RATE', defaultValue: '', trim: true, description: 'Rate at which users are spawned per second')
+        string(name: 'RUN_TIME', defaultValue: '', trim: true, description: 'Duration of the test in seconds')
+    }
+
+    stages {
+        stage('Validating parameters') {
+            steps {
+                script {
+                    if (params.USERS == '') {
+                        error("Please provide the number of users to simulate.")
+                    }
+                    if (params.SPAWN_RATE == '') {
+                        error("Please provide the rate at which users are spawned per second.")
+                    }
+                    if (params.RUN_TIME == '') {
+                        error("Please provide the duration of the test in seconds.")
+                    }
+                }
+            }
+        }
+
+        stage('Installing dependencies') {
+            steps {
+                script{
+                    withCredentials([file(credentialsId: params.ENV, variable: params.ENV)]) {
+                        sh """
+                            make setup
+                            cp \$${params.ENV} .env/
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Executing Client Side Performance tests') {
+            steps {
+                script {
+                    sh "uv run locust -f ${params.TEST_FILE_PATH} --env ${params.ENV} --users ${params.USERS} --spawn-rate ${params.SPAWN_RATE} --run-time ${params.RUN_TIME} --headless --html results/perf/report.html"
+                }
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'results/perf',
+                        reportFiles: 'report.html',
+                        reportName: "Locust Report",
+                    ])
+                }
+            }
+        }
+    }
+}
