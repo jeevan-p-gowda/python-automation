@@ -1,0 +1,130 @@
+pipeline {
+    agent { label "generic" }
+
+    options {
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        string(name: 'ENV', defaultValue: '', trim: true, description: 'Environment file name, which is stored in Jenkins credentials')
+        choice(name: 'TEST_RUN',
+               choices: ["accuracy", "feature", "regression", "rate_limit"],
+               description: 'Select a type of test run.')
+        string(name: 'TEST_FILE_PATH', defaultValue: '', trim: true, description: 'Relative path of test file (if more than one file separate them with space)')
+        choice(name: 'POST_TO_WEBEX', choices: ['false', 'true'], description: 'Notify results on SHM Automation Webex')
+        choice(name: 'POST_TO_XRAY', choices: ['false', 'true'], description: 'Update results in Xray test execution')
+        string(name: 'XRAY_TEST_EXEC_KEY', defaultValue: '', trim: true, description: 'Xray test exec key on Jira board (ex: if ECOM-1234, then 1234 is the key)')
+    }
+
+    stages {
+        stage('Validating parameters') {
+            steps {
+                script {
+                    if (params.ENV == '') {
+                        error("Please provide the environment file name.")
+                    }
+                    if (params.TEST_RUN == 'feature') {
+                        if (params.TEST_FILE_PATH == '') {
+                            error("Please provide the test file path.")
+                        }
+                    }
+                    if (params.POST_TO_XRAY == 'true') {
+                        if (params.XRAY_TEST_EXEC_KEY == '') {
+                            error("Please provide the Xray test execution key.")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Installing dependencies') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: params.ENV, variable: params.ENV)]) {
+                        sh """
+                            make setup
+                            cp \$${params.ENV} .env/
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Executing API tests') {
+            steps {
+                script {
+                    if (params.TEST_RUN == 'feature') {
+                        sh "uv run pytest tests/api/${params.TEST_FILE_PATH} --env ${params.ENV}"
+                    } else if (params.TEST_RUN == 'regression') {
+                        sh "uv run pytest tests/api/ -m 'not rate_limit' --env ${params.ENV}"
+                    } else if (params.TEST_RUN == 'rate_limit') {
+                        sh "uv run pytest tests/api/test_products_api.py::TestProductsApi -m rate_limit --env ${params.ENV}"
+                    } else {
+                        sh "uv run pytest tests/api/test_products_api_accuracy.py --env ${params.ENV}"
+                    }
+                }
+            }
+
+            post {
+                always {
+                    junit 'results/api/junit.xml'
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'results/api',
+                        reportFiles: 'report.html',
+                        reportName: "API Test Report",
+                    ])
+                    script {
+                        if (params.POST_TO_WEBEX == 'true') {
+                            def summary = junit testResults: 'results/api/junit.xml'
+                            def branch = env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'Unknown'
+                            String message = ""
+                            if (params.TEST_RUN == 'accuracy'){
+                                message = "> <h2>Products API Data Accuracy automation results </h2><hr> "
+                            } else {
+                                message = "> <h2>Products API automation results </h2><hr> "
+                            }
+
+                            message = message + "<b>Jenkins Job URL</b> : <a href = '${BUILD_URL}'>Job URL</a><br/>"
+
+                            if (params.POST_TO_XRAY == 'true') {
+                                withCredentials([string(credentialsId: 'JIRA_URL', variable: 'JIRA_URL')]) {
+                                    message = message + "<b> Xray Test Execution Report URL</b> : &#128196;<a href = '${JIRA_URL}${params.XRAY_TEST_EXEC_KEY}'>Report URL</a><br/>"
+                                }
+                            }
+
+                            message = message + "<b>Test Env</b> : ${params.ENV} <br/>"
+
+                            if (summary.failCount > 0) {
+                                message = message + "<b>Test Status</b> : &#10060; FAILED <br/>"
+                            } else if (summary.totalCount == summary.skipCount){
+                                message = message + "<b>Test Status</b> : &#9888; SKIPPED <br/>"
+                            } else {
+                                message = message + "<b>Test Status</b> : &#9989; PASSED <br/>"
+                            }
+
+                            message = message + "<b>Test Branch</b> : ${branch} <br/><pre> <b>Test Summary</b>  ⇒  Total : ${summary.totalCount}  |  Failures: ${summary.failCount}  |  Skipped: ${summary.skipCount}  | Passed: ${summary.passCount}  |</pre>"
+
+                            echo "${message}"
+
+                            withCredentials([string(credentialsId: 'WEBHOOK', variable: 'WEBHOOK')]) {
+                                sh """
+                                    curl -X POST --data-raw '{"markdown":"${message}"}' -H "Content-Type:application/json" $WEBHOOK
+                                """
+                            }
+                        }
+
+                        if (params.POST_TO_XRAY == 'true') {
+                            withCredentials([string(credentialsId: 'PRODUCTS_XRAY_CONFIG_ID', variable: 'PRODUCTS_XRAY_CONFIG_ID')]) {
+                                step([$class: 'XrayImportBuilder', endpointName: '/junit', importFilePath: 'results/api/junit.xml', importToSameExecution: 'true', projectKey: 'ECOM', testExecKey: "ECOM-${params.XRAY_TEST_EXEC_KEY}", serverInstance: PRODUCTS_XRAY_CONFIG_ID])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

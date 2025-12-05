@@ -1,0 +1,97 @@
+pipeline {
+    agent {
+        docker {
+            image 'mcr.microsoft.com/playwright/python:v1.54.0-noble'
+            args '-u root:sudo'
+        }
+    }
+
+    options {
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        string(name: 'ENV', defaultValue: '', trim: true, description: 'Environment file name, which is stored in Jenkins credentials')
+        choice(name: 'TEST_RUN',
+               choices: ["feature", "regression"],
+               description: 'Select a type of test run.')
+        string(name: 'TEST_FILE_PATH', defaultValue: '', trim: true, description: 'Relative path of test file (if more than one file separate them with space)')
+    }
+
+    stages {
+        stage('Validating parameters') {
+            steps {
+                script {
+                    if (params.ENV == '') {
+                        error("Please provide the environment file name.")
+                    }
+                    if (params.TEST_RUN == 'feature') {
+                        if (params.TEST_FILE_PATH == '') {
+                            error("Please provide the test file path.")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Installing dependencies') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: params.ENV, variable: params.ENV)]) {
+                        sh """
+                            make setup
+                            cp \$${params.ENV} .env/
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Executing UI tests') {
+            steps {
+                script {
+                    if (params.TEST_RUN == 'feature') {
+                        sh "uv run pytest tests/ui/${params.TEST_FILE_PATH} --env ${params.ENV}"
+                    } else {
+                        sh "uv run pytest tests/ui/ --env ${params.ENV}"
+                    }
+                }
+            }
+
+            post {
+                always {
+                    junit 'results/ui/junit.xml'
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'results/ui',
+                        reportFiles: 'report.html',
+                        reportName: "UI Test Report",
+                    ])
+                    script {
+                        if (params.POST_TO_WEBEX == 'true') {
+                            def summary = junit testResults: 'results/ui/junit.xml'
+                            def branch = env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'Unknown'
+                            String message = "> <h2>Python Playwright UI automation results </h2><hr> <b>Jenkins Job URL</b> : <a href = '${BUILD_URL}'>Job URL</a><br/>"
+
+                            message = message + "<b>Test Env</b> : ${params.ENV} <br/>"
+
+                            if (summary.failCount > 0) {
+                                message = message + "<b>Test Status</b> : &#10060; FAILED <br/>"
+                            } else if (summary.totalCount == summary.skipCount) {
+                                message = message + "<b>Test Status</b> : &#9888; SKIPPED <br/>"
+                            } else {
+                                message = message + "<b>Test Status</b> : &#9989; PASSED <br/>"
+                            }
+
+                            message = message + "<b>Test Branch</b> : ${branch} <br/><pre> <b>Test Summary</b>  ⇒  Total : ${summary.totalCount}  |  Failures: ${summary.failCount}  |  Skipped: ${summary.skipCount}  | Passed: ${summary.passCount}  |</pre>"
+                            echo "${message}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
