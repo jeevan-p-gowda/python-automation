@@ -13,6 +13,7 @@ pipeline {
                choices: ["accuracy", "feature", "regression", "rate_limit"],
                description: 'Select a type of test run.')
         string(name: 'TEST_FILE_PATH', defaultValue: '', trim: true, description: 'Relative path of test file (if more than one file separate them with space)')
+        separator(name: 'publishing_parameters', sectionHeader: 'Publishing Parameters')
         choice(name: 'POST_TO_WEBEX', choices: ['false', 'true'], description: 'Notify results on SHM Automation Webex')
         choice(name: 'POST_TO_XRAY', choices: ['false', 'true'], description: 'Update results in Xray test execution')
         string(name: 'XRAY_TEST_EXEC_KEY', defaultValue: '', trim: true, description: 'Xray test exec key on Jira board (ex: if ECOM-1234, then 1234 is the key)')
