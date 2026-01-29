@@ -25,6 +25,9 @@ pipeline {
             steps {
                 script {
                     if (params.TEST_RUN == 'feature') {
+                        if (env.IS_INT_ENV == 'false') {
+                            error("Feature tests can only be run on integration environment.")
+                        }
                         if (params.TEST_FILE_PATH == '') {
                             error("Please provide the test file path.")
                         }
@@ -46,6 +49,9 @@ pipeline {
                             make setup
                             cp \$${params.ENV} .env/
                         """
+                        def props = readProperties file: ".env/${params.ENV}.env"
+                        def baseUrl = props['BASE_URL']
+                        env.ENV = baseUrl
                     }
                 }
             }
@@ -96,7 +102,7 @@ pipeline {
                                 }
                             }
 
-                            message = message + "<b>Test Env</b> : ${params.ENV} <br/>"
+                            message = message + "<b>Test Env</b> : ${env.ENV} <br/>"
 
                             if (summary.failCount > 0) {
                                 message = message + "<b>Test Status</b> : &#10060; FAILED <br/>"
