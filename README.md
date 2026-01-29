@@ -1,5 +1,11 @@
 # python-automation <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" align=right width="100" height="100"><img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Requests_Python_Logo.png" align="right" width='auto' height="90"/><img src="https://playwright.dev/img/playwright-logo.svg" align="right" width='auto' height="90"/>
 
+[![pytest](https://img.shields.io/badge/pytest-testing-blue?logo=pytest&logoColor=white)](https://docs.pytest.org)
+[![Playwright](https://img.shields.io/badge/Playwright-Python-45ba4b?logo=playwright&logoColor=white)](https://playwright.dev/python)
+[![Requests](https://img.shields.io/badge/requests-HTTP%20client-black)](https://docs.python-requests.org/)
+[![uv](https://img.shields.io/badge/uv-package%20manager-6f42c1)](https://docs.astral.sh/uv/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An E2E unifying test automation framework template.
 
 ### 🏗️Pre-requisite
