@@ -42,8 +42,9 @@ An E2E unifying test automation framework template.
 > If using Windows, set IDE terminal to Git Bash and execute.
 
 ## Client Side Performance Testing <img src="https://avatars.githubusercontent.com/u/2641063?s=200&v=4" align=right width="100" height="100"/>
+[![Locust](https://img.shields.io/badge/Locust-performance-2ecc71)](https://locust.io)
 
-Framework has been equipped with [Locust](https://locust.io/) to calculate 95th percentile of all SHM APIs.
+Framework has been equipped with Locust to calculate 95th percentile of all SHM APIs.
 
 ### 🏋Load test command
 `uv run locust -f <relative_path_of_test_file> --env <env_file_name> --users <int> --spawn-rate <int> --run-time <time_in_sec> --headless`
