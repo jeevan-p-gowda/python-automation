@@ -67,6 +67,7 @@ line-ending = "auto"
 addopts = [ "-v",
             "--headed",
             "--browser=chromium",
+            "--browser-channel=msedge",
             "--log-cli-level=INFO",
             ]
 testpaths = ["tests"]

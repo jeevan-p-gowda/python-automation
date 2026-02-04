@@ -13,6 +13,7 @@ setup:
 	@uv venv
 	@source .venv/bin/activate
 	@uv sync
-	@playwright install chromium
+	@playwright install chromium --with-deps --only-shell
+	@playwright install msedge
 	@pre-commit install
 	@echo "✅ Setup complete!"
